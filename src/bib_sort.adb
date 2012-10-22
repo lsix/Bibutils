@@ -29,7 +29,27 @@
 -- The fact that you are presently reading this means that you have had      --
 -- knowledge of the CeCILL license and that you accept its terms.            --
 
-Bibutils
-========
+with Ada.Command_Line;
+with Bibliography_Library;
+with Bibentry;
+with Ada.Strings.Fixed;
+with Ada.Strings.Fixed.Less_Case_Insensitive;
 
-Some utilities to manage bibtex files (re-order entries, relocate associated pdf files...)
+procedure Bib_Sort is
+   Path : String := Ada.Command_Line.Argument(1);
+   Bib_File : Bibliography_Library.Bibliography_Library_Type;
+
+   function Compare_By_Key(Left, Right : Bibentry.Bibentry_Type'Class) return Boolean is
+
+   begin
+      return Ada.Strings.Fixed.Less_Case_Insensitive(Left.Get_Bibtex_Key, Right.Get_Bibtex_Key);
+   end Compare_By_Key;
+
+   procedure Sort_By_Key is new Bibliography_Library.Sort(Compare_By_Key);
+
+begin
+   Bib_File.Load_From_Bibtex_File(Path);
+   Sort_By_Key(Bib_File);
+   Bib_File.Save_To_Bibtex_File(Path);
+
+end Bib_Sort;

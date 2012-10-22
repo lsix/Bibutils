@@ -33,7 +33,7 @@ with Ada.Characters.Latin_1;
 with Ada.Exceptions;
 with Ada.Strings.Unbounded;                          use Ada.Strings.Unbounded;
 with Ada.Strings;
-
+with Character_Utils;
 
 package body Bibentry is
 
@@ -177,8 +177,9 @@ package body Bibentry is
 
    function Read(Stream : not null access Ada.Streams.Root_Stream_Type'Class)
                  return Bibentry_Type is
-      use Ada.Strings.Unbounded;
       use Ada.Exceptions;
+      use Ada.Strings.Unbounded;
+      use Character_Utils;
 
       Bib_Entry   : Bibentry_Type;
       Curr_Char   : Character;
@@ -220,21 +221,6 @@ package body Bibentry is
 
          return Curr_Char;
       end Get_Char;
-
-      function Is_White_Space(c : Character) return Boolean is
-         pragma Inline(Is_White_Space);
-      begin
-         return ((c = ' ') or
-        (c = Ada.Characters.Latin_1.HT) or
-        (c = Ada.Characters.Latin_1.CR) or
-        (c = Ada.Characters.Latin_1.LF));
-      end Is_White_Space;
-
-      function Is_Alpha(c : Character) return Boolean is
-         pragma Inline(Is_Alpha);
-      begin
-         return (c in 'a'..'z') or (c in 'A'..'Z');
-      end Is_Alpha;
 
       procedure Skip_Blank is
          pragma Inline(Skip_Blank);

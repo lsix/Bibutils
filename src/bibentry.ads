@@ -88,6 +88,10 @@ package Bibentry is
    procedure Print(Stream : not null access Ada.Streams.Root_Stream_Type'Class;
                    Item   : Bibentry_Type);
 
+   function Read(Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+                 curr_line_number : in out Natural;
+                 curr_char_number : in out Natural) return Bibentry_Type;
+
    function Read(Stream : not null access Ada.Streams.Root_Stream_Type'Class)
                  return Bibentry_Type;
 

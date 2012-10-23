@@ -175,8 +175,9 @@ package body Bibentry is
       Stream.Write(Buffer);
    end Print;
 
-   function Read(Stream : not null access Ada.Streams.Root_Stream_Type'Class)
-                 return Bibentry_Type is
+   function Read(Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+                 curr_line_number : in out Natural;
+                 curr_char_number : in out Natural) return Bibentry_Type is
       use Ada.Exceptions;
       use Ada.Strings.Unbounded;
       use Character_Utils;
@@ -196,10 +197,15 @@ package body Bibentry is
             Stream.Read(Buffer, Nb_Read);
             if Natural(Nb_Read) = 1 then
                Curr_Char := Character'Val(Buffer(1));
+               curr_char_number := Natural'Succ(curr_char_number);
             else
                raise End_Of_Stream_Reached;
             end if;
          end loop;
+
+         -- update position counters
+         curr_line_number := Natural'Succ(curr_line_number);
+         curr_char_number := 0;
       end Skip_Line;
 
       function Get_Char(Stream : not null access Ada.Streams.Root_Stream_Type'Class)
@@ -211,12 +217,15 @@ package body Bibentry is
          Stream.all.Read(Buffer, Nb_Read);
          if Natural(Nb_Read) = 1 then
             Curr_Char := Character'Val(Buffer(1));
+            curr_char_number := Natural'Succ(curr_char_number);
+            if Curr_Char = Ada.Characters.Latin_1.LF then
+               curr_line_number := Natural'Succ(curr_line_number);
+               curr_char_number := 0;
+            elsif Curr_Char = '%' then
+               Skip_Line(Stream);
+            end if;
          else
             raise End_Of_Stream_Reached;
-         end if;
-         if Curr_Char = '%' then
-            Skip_Line(Stream);
-            Curr_Char := Get_Char(Stream);
          end if;
 
          return Curr_Char;
@@ -236,7 +245,8 @@ package body Bibentry is
       begin
          -- Curr_Char
          if Curr_Char /= '{' then
-            Raise_Exception(Invalid_Entry'Identity, "'{' expected, '"&Curr_Char&"' found");
+            Raise_Exception(Invalid_Entry'Identity, "'{' expected, '"&Curr_Char&"' found at line " &
+                           Natural'Image(curr_line_number) & " char " & Natural'Image(curr_char_number));
          end if;
          loop
             Curr_Char := Get_Char(Stream);
@@ -266,7 +276,8 @@ package body Bibentry is
 
       -- Commence par un '@'
       if not(Curr_Char = '@') then
-         Raise_Exception(Invalid_Entry'Identity, "'@' expected, '"&Curr_Char&"' found");
+         Raise_Exception(Invalid_Entry'Identity, "'@' expected, '"&Curr_Char&"' found at line " &
+                           Natural'Image(curr_line_number) & " char " & Natural'Image(curr_char_number));
       end if;
 
       Curr_Char := Get_Char(Stream);
@@ -280,7 +291,8 @@ package body Bibentry is
 
       Skip_Blank;
       if not(Curr_Char = '{') then
-         raise Invalid_Entry;
+         Raise_Exception(Invalid_Entry'Identity, "'{' expected, '"&Curr_Char&"' found at line " &
+                           Natural'Image(curr_line_number) & " char " & Natural'Image(curr_char_number));
       end if;
       Skip_Blank;
 
@@ -293,7 +305,8 @@ package body Bibentry is
       Accumulator := Null_Unbounded_String;
       Skip_Blank;
       if not(Curr_Char = ',') then
-         Raise_Exception(Invalid_Entry'Identity, "',' expected, '"&Curr_Char&"' found");
+         Raise_Exception(Invalid_Entry'Identity, "',' expected, '"&Curr_Char&"' found at line " &
+                           Natural'Image(curr_line_number) & " char " & Natural'Image(curr_char_number));
       end if;
 
       Curr_Char := Get_Char(Stream);
@@ -309,7 +322,8 @@ package body Bibentry is
 
          Skip_Blank;
          if Curr_Char /= '=' then
-            Raise_Exception(Invalid_Entry'Identity, "'=' expected, '"&Curr_Char&"' found");
+            Raise_Exception(Invalid_Entry'Identity, "'=' expected, '"&Curr_Char&"' found at line " &
+                           Natural'Image(curr_line_number) & " char " & Natural'Image(curr_char_number));
          end if;
          Curr_Char := Get_Char(Stream);
          Skip_Blank;
@@ -329,7 +343,8 @@ package body Bibentry is
          exit when Curr_Char = '}';
 
          if Curr_Char /= ',' then
-            raise Invalid_Entry;
+            Raise_Exception(Invalid_Entry'Identity, "',' expected, '"&Curr_Char&"' found at line " &
+                           Natural'Image(curr_line_number) & " char " & Natural'Image(curr_char_number));
          end if;
          Curr_Char := Get_Char(Stream);
       end loop;
@@ -337,5 +352,13 @@ package body Bibentry is
 
       return Bib_Entry;
    end Read;
+
+   function Read(Stream : not null access Ada.Streams.Root_Stream_Type'Class) return Bibentry_Type is
+      curr_ln : Natural := 1;
+      curr_char : Natural := 1;
+   begin
+      return Read(Stream, curr_ln, curr_char);
+   end Read;
+
 
 end Bibentry;

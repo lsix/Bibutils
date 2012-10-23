@@ -229,9 +229,12 @@ package body Bibliography_Library is
                  return Bibliography_Library_Type is
       ret : Bibliography_Library_Type;
       ent : Bibentry_Type;
+
+      curr_ln_number : Natural := 1;
+      curr_cr_number : Natural := 1;
    begin
       loop
-         ent := Bibentry_Type'Input(Stream);
+         ent := Bibentry.Read(Stream, curr_ln_number, curr_cr_number);
          ret.Append(Item => ent);
       end loop;
    exception

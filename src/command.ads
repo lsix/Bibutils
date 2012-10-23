@@ -29,27 +29,38 @@
 -- The fact that you are presently reading this means that you have had      --
 -- knowledge of the CeCILL license and that you accept its terms.            --
 
-with Ada.Command_Line;
-with Bibliography_Library;
-with Bibentry;
-with Ada.Strings.Fixed;
-with Ada.Strings.Fixed.Less_Case_Insensitive;
+with Ada.Containers.Indefinite_Hashed_Maps;
+with Ada.Strings.Equal_Case_Insensitive;
+with Ada.Strings.Hash;
 
-procedure Bib_Sort is
-   Path : String := Ada.Command_Line.Argument(1);
-   Bib_File : Bibliography_Library.Bibliography_Library_Type;
+package Command is
 
-   function Compare_By_Key(Left, Right : Bibentry.Bibentry_Type'Class) return Boolean is
+   -- Execute a command called Cmd_Name
+   -- Each command have to register itself during
+   -- ellaboration to be accessible here
+   procedure Execute_Command(Cmd_Name : String);
 
-   begin
-      return Ada.Strings.Fixed.Less_Case_Insensitive(Left.Get_Bibtex_Key, Right.Get_Bibtex_Key);
-   end Compare_By_Key;
+   procedure Print_Program_Help;
 
-   procedure Sort_By_Key is new Bibliography_Library.Sort(Compare_By_Key);
+   -- Basic interface each command must conform to
+   type Command_Type is interface;
 
-begin
-   Bib_File.Load_From_Bibtex_File(Path);
-   Sort_By_Key(Bib_File);
-   Bib_File.Save_To_Bibtex_File(Path);
+   function Get_Name(Cmd : Command_Type) return String is abstract;
 
-end Bib_Sort;
+   procedure Print_Help(Cmd : Command_Type) is abstract;
+
+   procedure Execute(Cmd : Command_Type) is abstract;
+
+private
+
+   -- used for type registration
+   package Cmd_Map is new Ada.Containers.Indefinite_Hashed_Maps(Key_Type        => String,
+                                                                Element_Type    => Command_Type'Class,
+                                                                Hash            => Ada.Strings.Hash,
+                                                                Equivalent_Keys => Ada.Strings.Equal_Case_Insensitive,
+                                                                "="             => "=");
+   Commands_Registry : Cmd_Map.Map := Cmd_Map.Empty_Map;
+
+   procedure Register_Command(Cmd : Command_Type'Class);
+
+end Command;

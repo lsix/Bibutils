@@ -35,7 +35,7 @@ with Ada.Characters.Latin_1;
 package body Character_Utils is
    function Is_Alpha(Char : Character) return Boolean is
    begin
-      return Ada.Characters.Handling.Is_Letter(Char);
+      return ((Ada.Characters.Handling.Is_Letter(Char)) or (Char = '_'));
    end;
 
    function Is_Alphanumeric(Char : Character) return Boolean is

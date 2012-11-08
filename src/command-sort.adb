@@ -35,12 +35,14 @@ with Ada.Strings.Fixed.Less_Case_Insensitive;
 with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO;
-with Argument_Helper;
 with Bibentry;
 with Bibliography_Library;
 with Config;
+with In_Out_Arg_Helper;
+with Command_Line_Parser;
 
 package body Command.Sort is
+   Cmd_Parser : Command_Line_Parser.Command_Line_Parser_Type;
 
    function Get_Name(Cmd : Sort_Type) return String is
    begin
@@ -56,17 +58,14 @@ package body Command.Sort is
                  " <arguments>");
       New_Line;
       Put_Line("Allowed arguments are:");
-      for v of Argument_Helper.In_Out_Arguments loop
-         Put_Line(HT & To_String(v.Arg_Spec) & HT &
-                    To_String(v.Arg_Desc));
+      for c of Command_Line_Parser.Get_Registered_Arguments(Cmd_Parser) loop
+         Put_Line(HT & "-" & c & HT & Command_Line_Parser.Get_Help_Message(Cmd_Parser, c));
       end loop;
-
    end Print_Help;
 
    procedure Execute(Cmd : Sort_Type) is
       use Ada.Strings.Unbounded;
 
-      In_Out  : Argument_Helper.In_Out_Spec;
       Bibfile : Bibliography_Library.Bibliography_Library_Type;
 
       function Compare_By_Key(Left, Right : Bibentry.Bibentry_Type'Class) return Boolean is
@@ -77,19 +76,40 @@ package body Command.Sort is
 
       procedure Sort_By_Key is new Bibliography_Library.Sort(Compare_By_Key);
    begin
-      Argument_Helper.Parse_In_Out_Arguments(In_Out);
+      Command_Line_Parser.Parse(Cmd_Parser);
+      Ada.Text_IO.Put_Line(Ada.Strings.Unbounded.To_String(In_Out_Arg_Helper.arg_spec.input_path));
+      Ada.Text_IO.Put_Line(Ada.Strings.Unbounded.To_String(In_Out_Arg_Helper.arg_spec.output_path));
 
-      Bibfile.Load_From_Bibtex_File(To_String(In_Out.input_path));
+      Bibfile.Load_From_Bibtex_File(To_String(In_Out_Arg_Helper.arg_spec.input_path));
 
       Sort_By_Key(Bibfile);
 
-      Bibfile.Save_To_Bibtex_File(To_String(In_Out.output_path));
+      Bibfile.Save_To_Bibtex_File(To_String(In_Out_Arg_Helper.arg_spec.output_path));
    end Execute;
 
 begin
    declare
       Cmd : Sort_Type;
    begin
+      -- Initialize arguments
+      Command_Line_Parser.Register_Callback(Parser        => Cmd_Parser,
+                                            Argument_Name => 'i',
+                                            Callback      => In_Out_Arg_Helper.Parse_M_I'Access,
+                                            Help_Msg      => "Input file path",
+                                            Required      => true);
+
+      Command_Line_Parser.Register_Callback(Parser        => Cmd_Parser,
+                                            Argument_Name => 'o',
+                                            Callback      => In_Out_Arg_Helper.Parse_M_O'Access,
+                                            Help_Msg      => "Output file path",
+                                            Required      => false);
+
+      Command_Line_Parser.Register_Callback(Parser        => Cmd_Parser,
+                                            Argument_Name => 'e',
+                                            Callback      => In_Out_Arg_Helper.Parse_M_E'Access,
+                                            Help_Msg      => "Edit input file path in place",
+                                            Required      => false);
+
       Register_Command(Cmd);
    end;
 end Command.Sort;

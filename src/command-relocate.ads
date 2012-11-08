@@ -29,20 +29,18 @@
 -- The fact that you are presently reading this means that you have had      --
 -- knowledge of the CeCILL license and that you accept its terms.            --
 
-with Ada.Command_Line;
-with Command;
--- Calls the packages to be sure that they are initialized
-with Command.Help;
-with Command.Sort;
-with Command.Relocate;
+package Command.Relocate is
 
-procedure Bibutil is
-begin
-   -- At least one argument, the first one should be the command
-   if Ada.Command_Line.Argument_Count >= 1 then
-      Command.Execute_Command(Ada.Command_Line.Argument(1));
-   else
-      Command.Print_Program_Help;
-   end if;
 
-end Bibutil;
+   type Relocate_Command_Type is new Command_Type with null record;
+
+   overriding
+   function Get_Name(Cmd : Relocate_Command_Type) return String;
+
+   overriding
+   procedure Print_Help(Cmd : Relocate_Command_Type);
+
+   overriding
+   procedure Execute(Cmd : Relocate_Command_Type);
+
+end Command.Relocate;

@@ -77,8 +77,6 @@ package body Command.Sort is
       procedure Sort_By_Key is new Bibliography_Library.Sort(Compare_By_Key);
    begin
       Command_Line_Parser.Parse(Cmd_Parser);
-      Ada.Text_IO.Put_Line(Ada.Strings.Unbounded.To_String(In_Out_Arg_Helper.arg_spec.input_path));
-      Ada.Text_IO.Put_Line(Ada.Strings.Unbounded.To_String(In_Out_Arg_Helper.arg_spec.output_path));
 
       Bibfile.Load_From_Bibtex_File(To_String(In_Out_Arg_Helper.arg_spec.input_path));
 

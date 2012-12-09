@@ -29,7 +29,6 @@
 -- The fact that you are presently reading this means that you have had      --
 -- knowledge of the CeCILL license and that you accept its terms.            --
 
-with Ada.Directories;
 with Ada.IO_Exceptions;
 with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded;
@@ -120,7 +119,7 @@ package body File_Attribute_Helper is
          -- find the ':' which separate the path and the stype
          loop
             if pred_is_escape then
-               pred_is_escape := not(pred_is_escape);
+               pred_is_escape := false;
             else
                if Str(curr) = escape_char then
                   pred_is_escape := true;
@@ -172,9 +171,9 @@ package body File_Attribute_Helper is
    function Guess_Path_Separator return Character is
       use Ada.Strings.Fixed;
 
-      pth : String := Ada.Directories.Current_Directory;
-      nb_slash : Natural := Count(pth, "/");
-      nb_backslash : Natural := Count(pth, "\");
+      pth          : constant String  := Ada.Directories.Current_Directory;
+      nb_slash     : constant Natural := Count(pth, "/");
+      nb_backslash : constant Natural := Count(pth, "\");
 
       ret : character := '_';
    begin
@@ -195,7 +194,6 @@ package body File_Attribute_Helper is
    function Find_File_Match(Original_Path : String;
                             Lookup_Path   : String) return String is
       use Ada.Strings.Unbounded;
-      use Ada.Directories;
 
       Sep_Pos : Natural := Original_Path'Last;
 
@@ -227,7 +225,7 @@ package body File_Attribute_Helper is
          Append(try_path, trailing_part);
 
          begin
-            if Exists(To_String(try_path)) then
+            if Ada.Directories.Exists(To_String(try_path)) then
                found := true;
             else
                -- prepare for next search

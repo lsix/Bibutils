@@ -32,9 +32,11 @@
 with Ada.Command_Line;
 with Command;
 -- Calls the packages to be sure that they are initialized
+pragma Warnings(off);
 with Command.Help;
 with Command.Sort;
 with Command.Relocate;
+pragma Warnings(on);
 
 procedure Bibutil is
 begin

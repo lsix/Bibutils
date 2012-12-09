@@ -6,7 +6,7 @@ project Bibutil is
    for Main use ("bibutil.adb");
 
    package Compiler is
-      for Default_Switches ("ada") use ("-gnat12", "-gnatf", "-gnata");
+      for Default_Switches ("ada") use ("-gnat12", "-gnatf", "-gnata", "-gnatwa");
    end Compiler;
 
    package Builder is

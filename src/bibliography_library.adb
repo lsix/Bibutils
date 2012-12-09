@@ -31,7 +31,6 @@
 
 with Ada.Characters.Latin_1;
 with Ada.Directories;
-with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded;
 with Ada.Strings;
 with Ada.Text_IO.Text_Streams;
@@ -174,13 +173,11 @@ package body Bibliography_Library is
                          return Boolean is
       Curs  : Bibentry_Vector.Cursor := Lib.Content.First;
       Found : Boolean := false;
-      idx   : Natural;
    begin
       -- TODO refactor
       while Bibentry_Vector.Has_Element(Curs) and not(Found) loop
          if Bibentry_Vector.Element(Curs).Get_Bibtex_Key = Key then
             Found := true;
-            Idx   := Bibentry_Vector.To_Index(Curs);
          end if;
          Bibentry_Vector.Next(Curs);
       end loop;
@@ -215,7 +212,7 @@ package body Bibliography_Library is
    procedure Print(Stream : not null access Ada.Streams.Root_Stream_Type'Class;
                    Item   : Bibliography_Library_Type) is
       use Ada.Streams;
-      New_Line : Stream_Element_Array := (Stream_Element'Val(Character'Pos(Ada.Characters.Latin_1.CR)),
+      New_Line : constant Stream_Element_Array := (Stream_Element'Val(Character'Pos(Ada.Characters.Latin_1.CR)),
                                          Stream_Element'Val(Character'Pos(Ada.Characters.Latin_1.LF)));
    begin
       for Ent of Item.Content loop

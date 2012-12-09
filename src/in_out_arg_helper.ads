@@ -30,7 +30,6 @@
 -- knowledge of the CeCILL license and that you accept its terms.            --
 
 with Ada.Strings.Unbounded;
-with Command_Line_Parser;
 
 use Ada.Strings.Unbounded;
 

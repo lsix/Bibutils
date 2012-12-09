@@ -30,7 +30,6 @@
 -- knowledge of the CeCILL license and that you accept its terms.            --
 
 with Ada.Characters.Latin_1;
-with Ada.Command_Line;
 with Ada.Strings.Fixed.Less_Case_Insensitive;
 with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded;
@@ -44,6 +43,7 @@ with Command_Line_Parser;
 package body Command.Sort is
    Cmd_Parser : Command_Line_Parser.Command_Line_Parser_Type;
 
+   pragma Warnings(Off, "formal parameter ""Cmd"" is not referenced");
    function Get_Name(Cmd : Sort_Type) return String is
    begin
       return Command_Name;
@@ -78,12 +78,14 @@ package body Command.Sort is
    begin
       Command_Line_Parser.Parse(Cmd_Parser);
 
+
       Bibfile.Load_From_Bibtex_File(To_String(In_Out_Arg_Helper.arg_spec.input_path));
 
       Sort_By_Key(Bibfile);
 
       Bibfile.Save_To_Bibtex_File(To_String(In_Out_Arg_Helper.arg_spec.output_path));
    end Execute;
+   pragma Warnings(On, "formal parameter ""Cmd"" is not referenced");
 
 begin
    declare

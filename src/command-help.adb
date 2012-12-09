@@ -35,6 +35,7 @@ with Ada.Text_IO;
 
 package body Command.Help is
 
+   pragma Warnings(off, "formal parameter ""Cmd"" is not referenced");
    function Get_Name(Cmd : Help_Type) return String is
    begin
       return Command_Name;
@@ -46,6 +47,7 @@ package body Command.Help is
       IO.Put_Line("bibutil help <cmd>");
       IO.Put_Line(Ada.Characters.Latin_1.HT & "Prints the help for the cmd command.");
    end Print_Help;
+   pragma Warnings(on, "formal parameter ""Cmd"" is not referenced");
 
    procedure Execute(Cmd : Help_Type) is
       package CL renames Ada.Command_Line;

@@ -65,7 +65,7 @@ package body Command_Line_Parser is
    begin
       while curr_arg <= Argument_Count loop
          declare
-            arg : String := Argument(curr_arg);
+            arg : constant String := Argument(curr_arg);
          begin
             if arg'Last - arg'First = 1
               and then arg(arg'First) = '-'

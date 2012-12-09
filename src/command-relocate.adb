@@ -40,13 +40,14 @@ package body Command.Relocate is
    Cmd_Parser   : Command_Line_Parser.Command_Line_Parser_Type;
    New_Lib_Path : Ada.Strings.Unbounded.Unbounded_String;
 
+   pragma Warnings(off, "formal parameter ""Cmd"" is not referenced");
    function Get_Name(Cmd : Relocate_Command_Type) return String is
    begin
       return "relocate";
    end Get_Name;
 
+
    procedure Print_Help(Cmd : Relocate_Command_Type)is
-      use Ada.Text_IO;
    begin
       Command_Line_Parser.Parse(Cmd_Parser);
    end Print_Help;
@@ -61,18 +62,18 @@ package body Command.Relocate is
 
       for i in 1..Bib.Length loop
          declare
-            Ref : Bibliography_Library.Bibtexentry_Ref := Bib.Reference(i);
+            Ref : constant Bibliography_Library.Bibtexentry_Ref := Bib.Reference(i);
          begin
 
             if Ref.Has_Bibtex_Property("File") then
                declare
-                  File_Att : String := Bib.Reference(i).Get_Bibtex_Property("File");
+                  File_Att : constant String := Bib.Reference(i).Get_Bibtex_Property("File");
                begin
                   if not File_Attribute_Helper.Is_Valid_File_Attribute(File_Att) then
                      Put_Line("Invalid file property for bibtex entry " & Ref.Get_Bibtex_Key);
                   else
                      declare
-                        New_Pth : String := File_Attribute_Helper.Find_File_Match(File_Attribute_Helper.Get_Path(File_Att),
+                        New_Pth : constant String := File_Attribute_Helper.Find_File_Match(File_Attribute_Helper.Get_Path(File_Att),
                                                                                   To_String(New_Lib_Path));
                      begin
                         Ref.Set_Bibtex_Property("File",
@@ -94,11 +95,17 @@ package body Command.Relocate is
       Bib.Save_To_Bibtex_File(To_String(In_Out_Arg_Helper.arg_spec.output_Path));
 
    end Execute;
+   pragma Warnings(on, "formal parameter ""Cmd"" is not referenced");
 
+   pragma Warnings(off, "formal parameter ""c"" is not referenced");
+   -- function called when the library path option is detected on the command
+   -- line. The parameter c is the name of the argument met, and is not
+   -- necessarilly referenced.
    procedure Set_Lib_Path(c : Character; Pth : String) is
    begin
       New_Lib_Path := Ada.Strings.Unbounded.To_Unbounded_String(Pth);
    end Set_Lib_Path;
+   pragma Warnings(on, "formal parameter ""c"" is not referenced");
 
 begin
    declare

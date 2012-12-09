@@ -73,8 +73,8 @@ package body Bibentry is
                                  Prop_Name : String;
                                  Prop_Val  : String) is
       use Properties_Map;
-      us_prop_key : Unbounded_String := To_Unbounded_String(Prop_Name);
-      us_prop_val : Unbounded_String := To_Unbounded_String(Prop_Val);
+      us_prop_key : constant Unbounded_String := To_Unbounded_String(Prop_Name);
+      us_prop_val : constant Unbounded_String := To_Unbounded_String(Prop_Val);
    begin
       if Bibentry.properties.Contains(us_prop_key) then
          Bibentry.properties.Replace(Key      => us_prop_key,
@@ -90,7 +90,7 @@ package body Bibentry is
    function Get_Bibtex_Property(Bibentry  : Bibentry_Type;
                                 Prop_Name : String)
                                 return String is
-      us_prop_key : Unbounded_String := To_Unbounded_String(Prop_Name);
+      us_prop_key : constant Unbounded_String := To_Unbounded_String(Prop_Name);
    begin
       return To_String(Bibentry.properties.Element(us_prop_key));
    end Get_Bibtex_Property;
@@ -123,7 +123,6 @@ package body Bibentry is
 
    function To_String(Bibentry : Bibentry_Type) return String is
       use Ada.Strings;
-      use Ada.Strings.Unbounded;
 
       procedure New_Line(Str : in out Unbounded_String) is
       begin
@@ -164,7 +163,7 @@ package body Bibentry is
    procedure Print(Stream : not null access Ada.Streams.Root_Stream_Type'Class;
                    Item   : Bibentry_Type) is
       use Ada.Streams;
-      Str_rep : String := To_String(Item);
+      Str_rep : constant String := To_String(Item);
       Buffer  : Ada.Streams.Stream_Element_Array(Ada.Streams.Stream_Element_Offset(Str_rep'First)..Ada.Streams.Stream_Element_Offset(Str_rep'Last));
    begin
       for i in Str_rep'Range loop
@@ -179,13 +178,11 @@ package body Bibentry is
                  curr_line_number : in out Natural;
                  curr_char_number : in out Natural) return Bibentry_Type is
       use Ada.Exceptions;
-      use Ada.Strings.Unbounded;
       use Character_Utils;
 
       Bib_Entry   : Bibentry_Type;
       Curr_Char   : Character;
       Accumulator : Unbounded_String := Null_Unbounded_String;
-      Prop_Name   : Unbounded_String := Null_Unbounded_String;
 
       procedure Skip_Line(Stream : not null access Ada.Streams.Root_Stream_Type'Class) is
          pragma Inline(Skip_Line);
@@ -262,10 +259,10 @@ package body Bibentry is
          return To_String(Acc);
       end Read_Braket_Enclosed_Value;
 
-      function Read_Db_Quoted_Value return String is
-      begin
-         return "";
-      end Read_Db_Quoted_Value;
+--      function Read_Db_Quoted_Value return String is
+--      begin
+--         return "";
+--      end Read_Db_Quoted_Value;
 
 
    begin

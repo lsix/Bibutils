@@ -29,10 +29,12 @@
 -- The fact that you are presently reading this means that you have had      --
 -- knowledge of the CeCILL license and that you accept its terms.            --
 
+with Ada.Characters.Latin_1;
 with Ada.Strings.Unbounded;       use Ada.Strings.Unbounded;
 with Ada.Text_IO;                 use Ada.Text_IO;
 with Bibliography_Library;
 with Command_Line_Parser;
+with Config;
 with File_Attribute_Helper;
 with In_Out_Arg_Helper;
 
@@ -49,7 +51,14 @@ package body Command.Relocate is
 
    procedure Print_Help(Cmd : Relocate_Command_Type)is
    begin
-      Command_Line_Parser.Parse(Cmd_Parser);
+      Ada.Text_IO.Put_Line(Config.Name & " " & Get_Name(Cmd) & " <options>");
+      Ada.Text_IO.Put_Line(Ada.Characters.Latin_1.HT & "Updates the file attribute of each entry.");
+      Ada.Text_IO.New_Line;
+      for arg of Command_Line_Parser.Get_Registered_Arguments(Cmd_Parser) loop
+         Ada.Text_IO.Put(Ada.Characters.Latin_1.HT & "-" & arg);
+         Ada.Text_IO.Put(Ada.Characters.Latin_1.HT & Command_Line_Parser.Get_Help_Message(Cmd_Parser, arg));
+         Ada.Text_IO.New_Line;
+      end loop;
    end Print_Help;
 
 
@@ -60,14 +69,14 @@ package body Command.Relocate is
 
       Bib.Load_From_Bibtex_File(To_String(In_Out_Arg_Helper.arg_spec.input_path));
 
-      for i in 1..Bib.Length loop
+      for i in 0..(Bib.Length-1) loop
          declare
             Ref : constant Bibliography_Library.Bibtexentry_Ref := Bib.Reference(i);
          begin
 
-            if Ref.Has_Bibtex_Property("File") then
+            if Ref.Has_Bibtex_Property("file") then
                declare
-                  File_Att : constant String := Bib.Reference(i).Get_Bibtex_Property("File");
+                  File_Att : constant String := Bib.Reference(i).Get_Bibtex_Property("file");
                begin
                   if not File_Attribute_Helper.Is_Valid_File_Attribute(File_Att) then
                      Put_Line("Invalid file property for bibtex entry " & Ref.Get_Bibtex_Key);
@@ -76,7 +85,7 @@ package body Command.Relocate is
                         New_Pth : constant String := File_Attribute_Helper.Find_File_Match(File_Attribute_Helper.Get_Path(File_Att),
                                                                                   To_String(New_Lib_Path));
                      begin
-                        Ref.Set_Bibtex_Property("File",
+                        Ref.Set_Bibtex_Property("file",
                           File_Attribute_Helper.Build_File_Attribute(File_Path   => New_Pth,
                                                                      File_Format => File_Attribute_Helper.Get_File_Format(File_Att)));
                         Put_Line(Ref.Get_Bibtex_Key & ".file -> " & New_Pth);

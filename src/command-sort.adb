@@ -43,13 +43,14 @@ with Command_Line_Parser;
 package body Command.Sort is
    Cmd_Parser : Command_Line_Parser.Command_Line_Parser_Type;
 
-   pragma Warnings(Off, "formal parameter ""Cmd"" is not referenced");
    function Get_Name(Cmd : Sort_Command_Type) return String is
+      pragma Unreferenced (Cmd);
    begin
       return Command_Name;
    end Get_Name;
 
    procedure Print_Help(Cmd : Sort_Command_Type) is
+      pragma Unreferenced (Cmd);
       use Ada.Text_IO;
       use Ada.Characters.Latin_1;
       use Ada.Strings.Unbounded;
@@ -64,12 +65,12 @@ package body Command.Sort is
    end Print_Help;
 
    procedure Execute(Cmd : in out Sort_Command_Type) is
+      pragma Unreferenced (Cmd);
       use Ada.Strings.Unbounded;
 
       Bibfile : Bibliography_Library.Bibliography_Library_Type;
 
       function Compare_By_Key(Left, Right : Bibentry.Bibentry_Type'Class) return Boolean is
-
       begin
          return Ada.Strings.Fixed.Less_Case_Insensitive(Left.Get_Bibtex_Key, Right.Get_Bibtex_Key);
       end Compare_By_Key;
@@ -85,7 +86,6 @@ package body Command.Sort is
 
       Bibfile.Save_To_Bibtex_File(To_String(In_Out_Arg_Helper.arg_spec.output_path));
    end Execute;
-   pragma Warnings(On, "formal parameter ""Cmd"" is not referenced");
 
    procedure Init is
    begin

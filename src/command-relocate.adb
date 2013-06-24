@@ -42,8 +42,8 @@ package body Command.Relocate is
    Cmd_Parser   : Command_Line_Parser.Command_Line_Parser_Type;
    New_Lib_Path : Ada.Strings.Unbounded.Unbounded_String;
 
-   pragma Warnings(off, "formal parameter ""Cmd"" is not referenced");
    function Get_Name(Cmd : Relocate_Command_Type) return String is
+      pragma Unreferenced (Cmd);
    begin
       return "relocate";
    end Get_Name;
@@ -63,6 +63,7 @@ package body Command.Relocate is
 
 
    procedure Execute(Cmd : in out Relocate_Command_Type) is
+      pragma Unreferenced (Cmd);
       Bib : Bibliography_Library.Bibliography_Library_Type;
    begin
       Command_Line_Parser.Parse(Cmd_Parser);
@@ -104,17 +105,15 @@ package body Command.Relocate is
       Bib.Save_To_Bibtex_File(To_String(In_Out_Arg_Helper.arg_spec.output_Path));
 
    end Execute;
-   pragma Warnings(on, "formal parameter ""Cmd"" is not referenced");
 
-   pragma Warnings(off, "formal parameter ""c"" is not referenced");
    -- function called when the library path option is detected on the command
    -- line. The parameter c is the name of the argument met, and is not
    -- necessarilly referenced.
    procedure Set_Lib_Path(c : Character; Pth : String) is
+      pragma Unreferenced (c);
    begin
       New_Lib_Path := Ada.Strings.Unbounded.To_Unbounded_String(Pth);
    end Set_Lib_Path;
-   pragma Warnings(on, "formal parameter ""c"" is not referenced");
 
    procedure Init is
    begin

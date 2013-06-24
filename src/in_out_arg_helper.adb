@@ -31,26 +31,24 @@
 
 package body In_Out_Arg_Helper is
 
-   pragma Warnings(Off, "formal parameter ""c"" is not referenced");
-   -- the formal parameter c represents the name of the command line switch
-   -- that triggered the callback function. Its use is not necessary.
-
    procedure Parse_M_I(c    : Character;
                        Path : String) is
+      pragma Unreferenced (c);
    begin
       arg_spec.input_path := To_Unbounded_String(Path);
    end Parse_M_I;
 
    procedure Parse_M_O(c    : Character;
                        Path : String) is
+      pragma Unreferenced (c);
    begin
       arg_spec.output_Path := To_Unbounded_String(Path);
    end Parse_M_O;
 
    procedure Parse_M_E(c : Character) is
+      pragma Unreferenced (c);
    begin
       arg_spec.output_Path := arg_spec.input_path;
    end Parse_M_E;
-   pragma Warnings(On, "formal parameter ""c"" is not referenced");
 
 end In_Out_Arg_Helper;

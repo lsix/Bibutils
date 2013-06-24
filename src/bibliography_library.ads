@@ -32,6 +32,7 @@
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Streams;
 with Bibentry;                               use Bibentry;
+with Ada.Finalization;
 
 
 package Bibliography_Library is
@@ -39,7 +40,8 @@ package Bibliography_Library is
    type Bibtexentry_Ref(Data : not null access Bibentry_Type'Class)is limited null record
    with Implicit_Dereference => Data;
 
-   type Bibliography_Library_Type is tagged private;
+   type Bibliography_Library_Type is new
+     Ada.Finalization.Controlled with private;
 
    ----------------------------------------------------------------------------
    --                                                                        --
@@ -108,7 +110,12 @@ package Bibliography_Library is
    -- Says if the library contains an elemement with key key
    function Contains_Key(Lib : Bibliography_Library_Type;
                          key : String)
-     return Boolean;
+                         return Boolean;
+
+   overriding
+   procedure Adjust(Obj : in out Bibliography_Library_Type);
+   overriding
+   procedure Finalize(Obj : in out Bibliography_Library_Type);
 
    -- Re-orders the library according to a "<" function
    generic
@@ -135,7 +142,7 @@ private
                                        Element_Type => Bibentry_Type'Class,
                                        "="          => "=");
 
-   type Bibliography_Library_Type is tagged
+   type Bibliography_Library_Type is new Ada.Finalization.Controlled with
       record
          Content : Bibentry_Vector.Vector := Bibentry_Vector.Empty_Vector;
       end record;

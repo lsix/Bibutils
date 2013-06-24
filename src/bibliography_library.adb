@@ -240,4 +240,14 @@ package body Bibliography_Library is
          return ret;
    end Read;
 
+   procedure Adjust(Obj : in out Bibliography_Library_Type) is
+   begin
+      Obj.Content := Obj.Content.Copy;
+   end Adjust;
+
+   procedure Finalize(Obj : in out Bibliography_Library_Type) is
+   begin
+      Obj.Content.Clear;
+   end Finalize;
+
 end Bibliography_Library;

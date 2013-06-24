@@ -30,20 +30,21 @@
 -- knowledge of the CeCILL license and that you accept its terms.            --
 
 package Command.Help is
-   pragma Elaborate_Body(Command.Help);
-
-   type Help_Type is new Command_Type with null record;
-
-   overriding
-   function Get_Name(Cmd : Help_Type) return String;
-
-   overriding
-   procedure Print_Help(Cmd : Help_Type);
-
-   overriding
-   procedure Execute(Cmd : Help_Type);
+   procedure Init;
 
 private
+   type Help_Command_Type is new Command_Type with null record;
+
+   overriding
+   function Get_Name(Cmd : Help_Command_Type) return String;
+
+   overriding
+   procedure Print_Help(Cmd : Help_Command_Type);
+
+   overriding
+   procedure Execute(Cmd : in out Help_Command_Type);
+
+   Instance : aliased Help_Command_Type;
    Command_Name : constant string := "help";
 
 end Command.Help;

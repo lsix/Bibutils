@@ -44,12 +44,12 @@ package body Command.Sort is
    Cmd_Parser : Command_Line_Parser.Command_Line_Parser_Type;
 
    pragma Warnings(Off, "formal parameter ""Cmd"" is not referenced");
-   function Get_Name(Cmd : Sort_Type) return String is
+   function Get_Name(Cmd : Sort_Command_Type) return String is
    begin
       return Command_Name;
    end Get_Name;
 
-   procedure Print_Help(Cmd : Sort_Type) is
+   procedure Print_Help(Cmd : Sort_Command_Type) is
       use Ada.Text_IO;
       use Ada.Characters.Latin_1;
       use Ada.Strings.Unbounded;
@@ -63,7 +63,7 @@ package body Command.Sort is
       end loop;
    end Print_Help;
 
-   procedure Execute(Cmd : Sort_Type) is
+   procedure Execute(Cmd : in out Sort_Command_Type) is
       use Ada.Strings.Unbounded;
 
       Bibfile : Bibliography_Library.Bibliography_Library_Type;
@@ -87,9 +87,7 @@ package body Command.Sort is
    end Execute;
    pragma Warnings(On, "formal parameter ""Cmd"" is not referenced");
 
-begin
-   declare
-      Cmd : Sort_Type;
+   procedure Init is
    begin
       -- Initialize arguments
       Command_Line_Parser.Register_Callback(Parser        => Cmd_Parser,
@@ -110,6 +108,7 @@ begin
                                             Help_Msg      => "Edit input file path in place",
                                             Required      => false);
 
-      Register_Command(Cmd);
-   end;
+      Register_Command(Instance'Access);
+   end Init;
+
 end Command.Sort;

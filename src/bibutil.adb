@@ -30,19 +30,31 @@
 -- knowledge of the CeCILL license and that you accept its terms.            --
 
 with Ada.Command_Line;
+with Ada.Command_Line.Remove;
 with Command;
--- Calls the packages to be sure that they are initialized
-pragma Warnings(off);
+
 with Command.Help;
 with Command.Sort;
 with Command.Relocate;
-pragma Warnings(on);
+
 
 procedure Bibutil is
 begin
+   -- Set up commands
+   Command.Help.Init;
+   Command.Sort.Init;
+   Command.Relocate.Init;
+
    -- At least one argument, the first one should be the command
    if Ada.Command_Line.Argument_Count >= 1 then
-      Command.Execute_Command(Ada.Command_Line.Argument(1));
+      declare
+         cmd : constant String := Ada.Command_Line.Argument(1);
+      begin
+         -- When a command is ran, it only sees its arguments not
+         -- the ones passed to the main program
+         Ada.Command_Line.Remove.Remove_Argument(1);
+         Command.Execute_Command(Cmd);
+      end;
    else
       Command.Print_Program_Help;
    end if;

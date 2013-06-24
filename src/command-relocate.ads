@@ -30,8 +30,8 @@
 -- knowledge of the CeCILL license and that you accept its terms.            --
 
 package Command.Relocate is
-
-
+   procedure Init;
+private
    type Relocate_Command_Type is new Command_Type with null record;
 
    overriding
@@ -41,6 +41,7 @@ package Command.Relocate is
    procedure Print_Help(Cmd : Relocate_Command_Type);
 
    overriding
-   procedure Execute(Cmd : Relocate_Command_Type);
+   procedure Execute(Cmd : in out Relocate_Command_Type);
 
+   Instance : aliased Relocate_Command_Type;
 end Command.Relocate;

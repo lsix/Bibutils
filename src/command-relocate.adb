@@ -62,7 +62,7 @@ package body Command.Relocate is
    end Print_Help;
 
 
-   procedure Execute(Cmd : Relocate_Command_Type) is
+   procedure Execute(Cmd : in out Relocate_Command_Type) is
       Bib : Bibliography_Library.Bibliography_Library_Type;
    begin
       Command_Line_Parser.Parse(Cmd_Parser);
@@ -76,7 +76,7 @@ package body Command.Relocate is
 
             if Ref.Has_Bibtex_Property("file") then
                declare
-                  File_Att : constant String := Bib.Reference(i).Get_Bibtex_Property("file");
+                  File_Att : constant String := Ref.Get_Bibtex_Property("file");
                begin
                   if not File_Attribute_Helper.Is_Valid_File_Attribute(File_Att) then
                      Put_Line("Invalid file property for bibtex entry " & Ref.Get_Bibtex_Key);
@@ -116,11 +116,8 @@ package body Command.Relocate is
    end Set_Lib_Path;
    pragma Warnings(on, "formal parameter ""c"" is not referenced");
 
-begin
-   declare
-      Cmd : Relocate_Command_Type;
+   procedure Init is
    begin
-
       -- Prepare arguments
       -- Initialize arguments
       Command_Line_Parser.Register_Callback(Parser        => Cmd_Parser,
@@ -147,6 +144,8 @@ begin
                                             Help_Msg      => "Path where is located the library",
                                             Required      => true);
 
-      Command.Register_Command(Cmd);
-   end;
+      Command.Register_Command(Instance'Access);
+
+   end Init;
+
 end Command.Relocate;

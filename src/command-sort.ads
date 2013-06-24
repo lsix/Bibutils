@@ -30,20 +30,20 @@
 -- knowledge of the CeCILL license and that you accept its terms.            --
 
 package Command.Sort is
-   pragma Elaborate_Body(Command.Sort);
-
-   type Sort_Type is new Command_Type with null record;
-
-   overriding
-   function Get_Name(Cmd : Sort_Type) return String;
-
-   overriding
-   procedure Print_Help(Cmd : Sort_Type);
-
-   overriding
-   procedure Execute(Cmd : Sort_Type);
+   procedure Init;
 
 private
-   Command_Name : constant String := "sort";
+   type Sort_Command_Type is new Command_Type with null record;
 
+   overriding
+   function Get_Name(Cmd : Sort_Command_Type) return String;
+
+   overriding
+   procedure Print_Help(Cmd : Sort_Command_Type);
+
+   overriding
+   procedure Execute(Cmd : in out Sort_Command_Type);
+
+   Command_Name : constant String := "sort";
+   Instance : aliased Sort_Command_Type;
 end Command.Sort;

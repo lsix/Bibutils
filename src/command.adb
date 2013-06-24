@@ -31,15 +31,16 @@
 
 with Ada.Characters.Latin_1;
 with Ada.Text_IO;
+with Ada.Strings.Fixed.Equal_Case_Insensitive;
 
 package body Command is
 
    procedure Execute_Command(Cmd_Name : String) is
    begin
-      Commands_Registry.Element(Cmd_Name).Execute;
+      Commands_Registry.Reference(Cmd_Name).all.Execute;
    end Execute_Command;
 
-   procedure Register_Command(Cmd : Command_Type'Class) is
+   procedure Register_Command(Cmd : Command_Type_Access) is
    begin
       Commands_Registry.Insert(Cmd.Get_Name, Cmd);
    end Register_Command;
@@ -56,5 +57,15 @@ package body Command is
          IO.Put_Line(HT & e.Get_Name);
       end loop;
    end Print_Program_Help;
+
+   function "="(Left, Right : Command_Type'Class) return Boolean is
+   begin
+      return Ada.Strings.Fixed.Equal_Case_Insensitive(Get_Name(Left),
+                                                      Get_name(Right));
+   end "=";
+   function "="(Left, Right : Command_Type_Access) return Boolean is
+   begin
+      return Left.all = Right.all;
+   end "=";
 
 end Command;

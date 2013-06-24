@@ -32,6 +32,7 @@
 with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Strings.Equal_Case_Insensitive;
 with Ada.Strings.Hash;
+with Ada.Characters.Handling;
 
 package Command is
 
@@ -42,25 +43,40 @@ package Command is
 
    procedure Print_Program_Help;
 
-   -- Basic interface each command must conform to
-   type Command_Type is interface;
-
-   function Get_Name(Cmd : Command_Type) return String is abstract;
-
-   procedure Print_Help(Cmd : Command_Type) is abstract;
-
-   procedure Execute(Cmd : Command_Type) is abstract;
-
 private
+   ----------------------------------------------------------------------------
+   -- Basic interface each command must conform to
+   type Command_Type is abstract tagged limited null record;
+   type Command_Type_Access is access all Command_Type'Class;
 
+   function  Get_Name  (Cmd : Command_Type) return String is abstract
+     with Post'Class =>
+       (for all c of Get_Name'Result =>
+         Ada.Characters.Handling.Is_Alphanumeric(c));
+   -- Returns the name of a command
+   procedure Print_Help(Cmd : Command_Type) is abstract;
+   -- Prints a help message on the terminal describing how to use the
+   -- command
+   procedure Execute   (Cmd : in out Command_Type) is abstract;
+   -- Executes the command. Might change the internal state of the
+   -- command
+
+   function "="(Left, Right : Command_Type'Class) return Boolean;
+
+
+   function "="(Left, Right : Command_Type_Access) return Boolean;
+
+   ----------------------------------------------------------------------------
    -- used for type registration
-   package Cmd_Map is new Ada.Containers.Indefinite_Hashed_Maps(Key_Type        => String,
-                                                                Element_Type    => Command_Type'Class,
-                                                                Hash            => Ada.Strings.Hash,
-                                                                Equivalent_Keys => Ada.Strings.Equal_Case_Insensitive,
-                                                                "="             => "=");
+   package Cmd_Map is new
+     Ada.Containers.Indefinite_Hashed_Maps(Key_Type        => String,
+                                           Element_Type    => Command_Type_Access,
+                                           Hash            => Ada.Strings.Hash,
+                                           Equivalent_Keys => Ada.Strings.Equal_Case_Insensitive,
+                                           "="             => "=");
+
    Commands_Registry : Cmd_Map.Map := Cmd_Map.Empty_Map;
 
-   procedure Register_Command(Cmd : Command_Type'Class);
+   procedure Register_Command(Cmd : Command_Type_Access);
 
 end Command;

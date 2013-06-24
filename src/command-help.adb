@@ -36,12 +36,12 @@ with Ada.Text_IO;
 package body Command.Help is
 
    pragma Warnings(off, "formal parameter ""Cmd"" is not referenced");
-   function Get_Name(Cmd : Help_Type) return String is
+   function Get_Name(Cmd : Help_Command_Type) return String is
    begin
       return Command_Name;
    end Get_Name;
 
-   procedure Print_Help(Cmd : Help_Type) is
+   procedure Print_Help(Cmd : Help_Command_Type) is
       package IO renames Ada.Text_IO;
    begin
       IO.Put_Line("bibutil help <cmd>");
@@ -49,12 +49,12 @@ package body Command.Help is
    end Print_Help;
    pragma Warnings(on, "formal parameter ""Cmd"" is not referenced");
 
-   procedure Execute(Cmd : Help_Type) is
+   procedure Execute(Cmd : in out Help_Command_Type) is
       package CL renames Ada.Command_Line;
    begin
       if CL.Argument_Count = 2 then
          if Commands_Registry.Contains(CL.Argument(2)) then
-            Commands_Registry.Reference(CL.Argument(2)).Print_Help;
+            Commands_Registry.Reference(CL.Argument(2)).all.Print_Help;
          else
             Ada.Text_IO.Put_Line("Unknown command " & '"' & CL.Argument(2) & '"' & "." );
          end if;
@@ -64,11 +64,8 @@ package body Command.Help is
       end if;
    end Execute;
 
-begin
-   declare
-      cmd : Help_Type;
+   procedure Init is
    begin
-      Register_Command( cmd );
-   end;
-
+      Register_Command( Instance'Access );
+   end Init;
 end Command.Help;

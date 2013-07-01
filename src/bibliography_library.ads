@@ -37,11 +37,10 @@ with Ada.Finalization;
 
 package Bibliography_Library is
 
-   type Bibtexentry_Ref(Data : not null access Bibentry_Type'Class)is limited null record
+   type Bibtexentry_Ref(Data : not null access Bibentry_Type)is limited null record
    with Implicit_Dereference => Data;
 
-   type Bibliography_Library_Type is new
-     Ada.Finalization.Controlled with private;
+   type Bibliography_Library_Type is private;
 
    ----------------------------------------------------------------------------
    --                                                                        --
@@ -66,8 +65,8 @@ package Bibliography_Library is
    -- Append a reference entry into the library
    -- No element in the library can already have the same key
    procedure Append(Lib  : in out Bibliography_Library_Type;
-                    Item : Bibentry_Type'Class)
-   with Precondition => not(Lib.Contains_Key(Item.Get_Bibtex_Key));
+                    Item : Bibentry_Type)
+   	with Precondition => not(Contains_Key(Lib, Bibentry.Get_Bibtex_Key(Item)));
 
    -- Get the number of elements stored inside the library
    function Length(Lib : Bibliography_Library_Type)
@@ -76,50 +75,45 @@ package Bibliography_Library is
    -- Retreive an element by its number
    function Element(Lib : Bibliography_Library_Type;
                     Pos : Natural)
-                    return Bibentry_Type'Class
-     with Precondition => Pos < Lib.Length;
+                    return Bibentry_Type
+   	with Precondition => Pos < Length(Lib);
 
    -- Retreive an element by its key
    function Element(Lib : Bibliography_Library_Type;
                     Key : String)
-                    return Bibentry_Type'Class
-     with Precondition => Lib.Contains_Key(Key);
+                    return Bibentry.Bibentry_Type
+   	with Precondition => Contains_Key(Lib, Key);
 
    -- Get a reference on an element by its number
    function Reference(Lib : in out Bibliography_Library_Type;
                       Pos : Natural)
                       return Bibtexentry_Ref
-     with Precondition => Pos < Lib.Length;
+   	with Precondition => Pos < Length(Lib);
 
    -- Get a reference on a element by its key
    function Reference(Lib : in out Bibliography_Library_Type;
                       Key : String)
                       return Bibtexentry_Ref
-     with Precondition => Lib.Contains_Key(Key);
+     	with Precondition => Contains_Key(Lib, Key);
 
    -- Remove an element given its id in the library
    procedure Remove(Lib : in out Bibliography_Library_Type;
                     Pos : Natural)
-     with Precondition => Pos < Lib.Length;
+     	with Precondition => Pos < Length(Lib);
 
    -- Remove an element given its bibtex key
    procedure Remove(Lib : in out Bibliography_Library_Type;
                     Key : String)
-   with Precondition => Lib.Contains_Key(Key);
+        with Precondition => Contains_Key(Lib, Key);
 
    -- Says if the library contains an elemement with key key
    function Contains_Key(Lib : Bibliography_Library_Type;
                          key : String)
                          return Boolean;
 
-   overriding
-   procedure Adjust(Obj : in out Bibliography_Library_Type);
-   overriding
-   procedure Finalize(Obj : in out Bibliography_Library_Type);
-
    -- Re-orders the library according to a "<" function
    generic
-      with function "<"(Left, Right : Bibentry_Type'Class) return Boolean;
+      with function "<"(Left, Right : Bibentry_Type) return Boolean;
    procedure Sort(Lib : in out Bibliography_Library_Type);
 
    -- Returns a string representation of the bibliography library
@@ -139,10 +133,10 @@ package Bibliography_Library is
 private
    package Bibentry_Vector is new
      Ada.Containers.Indefinite_Vectors(Index_Type   => Natural,
-                                       Element_Type => Bibentry_Type'Class,
+                                       Element_Type => Bibentry_Type,
                                        "="          => "=");
 
-   type Bibliography_Library_Type is new Ada.Finalization.Controlled with
+   type Bibliography_Library_Type is
       record
          Content : Bibentry_Vector.Vector := Bibentry_Vector.Empty_Vector;
       end record;

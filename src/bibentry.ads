@@ -32,17 +32,19 @@
 with Ada.Containers.Ordered_Maps;
 with Ada.Streams;
 with Ada.Strings.Unbounded;
+with Ada.Finalization;
 
 package Bibentry is
 
    -- Contient les noms des propriétés d'une entrée bibliographique
    type Bibentry_Prop_Name_Array is array (Natural range <>) of String(1..50);
 
-   type Bibentry_Type is tagged private;
+   type Bibentry_Type is private;
 
    -- Set the type of bibentry (article, inproceeding, phdthesis,...)
    procedure Set_Bibtex_Type(Bibentry  : in out Bibentry_Type;
-                             Type_Name : String);
+                             Type_Name : String)
+     with Postcondition => Get_Bibtex_Type(Bibentry) = Type_Name;
 
    -- Get the name of the bibentry
    function Get_Bibtex_Type(Bibentry : Bibentry_Type)
@@ -51,7 +53,8 @@ package Bibentry is
    -- Set the bibtex key of the bibentry bibliography
    -- entry element
    procedure Set_Bibtex_Key(Bibentry : in out Bibentry_Type;
-                            Key      : String);
+                            Key      : String)
+     with Postcondition => Get_Bibtex_Key(Bibentry) = Key;
 
    -- Get the bibtex key of the bibentry bibliography
    -- element
@@ -62,7 +65,8 @@ package Bibentry is
    -- entry.
    procedure Set_Bibtex_Property(Bibentry  : in out Bibentry_Type;
                                  Prop_Name : String;
-                                 Prop_Val  : String);
+                                 Prop_Val  : String)
+     with Postcondition => Has_Bibtex_Property(Bibentry, Prop_Name);
 
    -- Tels wether or not the property Prop_Name is defined
    -- (has a value) in the Bibentry bibliography entry.
@@ -75,7 +79,7 @@ package Bibentry is
    function Get_Bibtex_Property(Bibentry  : Bibentry_Type;
                                 Prop_Name : String)
                                 return String
-   with Precondition => Has_Bibtex_Property(Bibentry, Prop_Name);
+     with Precondition => Has_Bibtex_Property(Bibentry, Prop_Name);
 
    -- Retourne l'ensemble des propriétés définies pour une entrée
    -- bibliographique
@@ -84,10 +88,15 @@ package Bibentry is
 
    function To_String(Bibentry : Bibentry_Type) return String;
 
-   -- I/O related operations
+   ----------------------------------------------------------------------------
+   --                        I/O related operations                          --
+   ----------------------------------------------------------------------------
+
+   -- Print an item to a strema.
    procedure Print(Stream : not null access Ada.Streams.Root_Stream_Type'Class;
                    Item   : Bibentry_Type);
 
+   -- 
    function Read(Stream : not null access Ada.Streams.Root_Stream_Type'Class;
                  curr_line_number : in out Natural;
                  curr_char_number : in out Natural) return Bibentry_Type;
@@ -108,7 +117,7 @@ private
                                  "<"          => Ada.Strings.Unbounded."<",
                                  "="          => Ada.Strings.Unbounded."=");
 
-   type Bibentry_Type is tagged
+   type Bibentry_Type is 
       record
          Key        : Ada.Strings.Unbounded.Unbounded_String;
          Entry_Type : Ada.Strings.Unbounded.Unbounded_String;

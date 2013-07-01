@@ -81,7 +81,7 @@ package body Bibliography_Library is
    end Save_To_Bibtex_File;
 
    procedure Append(Lib  : in out Bibliography_Library_Type;
-                    Item : Bibentry_Type'Class) is
+                    Item : Bibentry_Type) is
    begin
       Lib.Content.Append(Item);
    end Append;
@@ -94,21 +94,21 @@ package body Bibliography_Library is
 
    function Element(Lib : Bibliography_Library_Type;
                     Pos : Natural)
-                    return Bibentry_Type'Class is
+                    return Bibentry_Type is
    begin
       return Lib.Content.Element(Pos);
    end Element;
 
    function Element(Lib : Bibliography_Library_Type;
                     Key : String)
-                    return Bibentry_Type'Class is
+                    return Bibentry_Type is
       Curs  : Bibentry_Vector.Cursor := Lib.Content.First;
       Found : Boolean := false;
       idx   : Natural;
    begin
       -- TODO refactor
       while Bibentry_Vector.Has_Element(Curs) and not(Found) loop
-         if Bibentry_Vector.Element(Curs).Get_Bibtex_Key = Key then
+         if Bibentry.Get_Bibtex_Key(Bibentry_Vector.Element(Curs)) = Key then
             Found := true;
             Idx   := Bibentry_Vector.To_Index(Curs);
          end if;
@@ -134,7 +134,7 @@ package body Bibliography_Library is
    begin
       -- TODO refactor
       while Bibentry_Vector.Has_Element(Curs) and not(Found) loop
-         if Bibentry_Vector.Element(Curs).Get_Bibtex_Key = Key then
+         if Bibentry.Get_Bibtex_Key(Bibentry_Vector.Element(Curs)) = Key then
             Found := true;
             Idx   := Bibentry_Vector.To_Index(Curs);
          end if;
@@ -158,7 +158,7 @@ package body Bibliography_Library is
    begin
       -- TODO refactor
       while Bibentry_Vector.Has_Element(Curs) and not(Found) loop
-         if Bibentry_Vector.Element(Curs).Get_Bibtex_Key = Key then
+         if Bibentry.Get_Bibtex_Key(Bibentry_Vector.Element(Curs)) = Key then
             Found := true;
             Idx   := Bibentry_Vector.To_Index(Curs);
          end if;
@@ -176,7 +176,7 @@ package body Bibliography_Library is
    begin
       -- TODO refactor
       while Bibentry_Vector.Has_Element(Curs) and not(Found) loop
-         if Bibentry_Vector.Element(Curs).Get_Bibtex_Key = Key then
+         if Bibentry.Get_Bibtex_Key(Bibentry_Vector.Element(Curs)) = Key then
             Found := true;
          end if;
          Bibentry_Vector.Next(Curs);
@@ -199,7 +199,7 @@ package body Bibliography_Library is
       Curs : Bibentry_Vector.Cursor := Lib.Content.First;
    begin
       while Bibentry_Vector.Has_Element(Curs) loop
-         Append(Str_const, Bibentry_Vector.Element(Curs).To_String);
+         Append(Str_const, Bibentry.To_String(Bibentry_Vector.Element(Curs)));
          Bibentry_Vector.Next(Curs);
          if Bibentry_Vector.Has_Element(Curs) then
             Append(Str_const, Ada.Characters.Latin_1.LF);
@@ -232,7 +232,7 @@ package body Bibliography_Library is
    begin
       loop
          ent := Bibentry.Read(Stream, curr_ln_number, curr_cr_number);
-         ret.Append(Item => ent);
+         Append(ret, Item => ent);
       end loop;
    exception
          -- Only way to detect the end is to reach the end of the stream

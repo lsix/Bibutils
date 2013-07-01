@@ -32,6 +32,7 @@
 with Ada.Characters.Latin_1;
 with Ada.Strings.Unbounded;       use Ada.Strings.Unbounded;
 with Ada.Text_IO;                 use Ada.Text_IO;
+with Bibentry;
 with Bibliography_Library;
 with Command_Line_Parser;
 with Config;
@@ -63,46 +64,49 @@ package body Command.Relocate is
 
 
    procedure Execute(Cmd : in out Relocate_Command_Type) is
-      pragma Unreferenced (Cmd);
-      Bib : Bibliography_Library.Bibliography_Library_Type;
+      	pragma Unreferenced (Cmd);
+	package BE renames Bibentry;
+      	Bib : Bibliography_Library.Bibliography_Library_Type;
    begin
       Command_Line_Parser.Parse(Cmd_Parser);
 
-      Bib.Load_From_Bibtex_File(To_String(In_Out_Arg_Helper.arg_spec.input_path));
+      Bibliography_Library.Load_From_Bibtex_File(Bib,
+                                                 To_String(In_Out_Arg_Helper.arg_spec.input_path));
 
-      for i in 0..(Bib.Length-1) loop
+      for i in 0..(Bibliography_Library.Length(Bib)-1) loop
          declare
-            Ref : constant Bibliography_Library.Bibtexentry_Ref := Bib.Reference(i);
+            Ref : constant Bibliography_Library.Bibtexentry_Ref := Bibliography_Library.Reference(Bib, i);
          begin
 
-            if Ref.Has_Bibtex_Property("file") then
+            if BE.Has_Bibtex_Property(Ref, "file") then
                declare
-                  File_Att : constant String := Ref.Get_Bibtex_Property("file");
+                  File_Att : constant String := BE.Get_Bibtex_Property(Ref, "file");
                begin
                   if not File_Attribute_Helper.Is_Valid_File_Attribute(File_Att) then
-                     Put_Line("Invalid file property for bibtex entry " & Ref.Get_Bibtex_Key);
+                     Put_Line("Invalid file property for bibtex entry " & BE.Get_Bibtex_Key(Ref));
                   else
                      declare
                         New_Pth : constant String := File_Attribute_Helper.Find_File_Match(File_Attribute_Helper.Get_Path(File_Att),
                                                                                   To_String(New_Lib_Path));
                      begin
-                        Ref.Set_Bibtex_Property("file",
+                        BE.Set_Bibtex_Property(Ref, "file",
                           File_Attribute_Helper.Build_File_Attribute(File_Path   => New_Pth,
                                                                      File_Format => File_Attribute_Helper.Get_File_Format(File_Att)));
-                        Put_Line(Ref.Get_Bibtex_Key & ".file -> " & New_Pth);
+                        Put_Line(BE.Get_Bibtex_Key(Ref) & ".file -> " & New_Pth);
                      exception
                         when File_Attribute_Helper.Matching_File_Not_Found =>
-                           Put_Line("Unable to find new file location for " & Ref.Get_Bibtex_Key);
+                           Put_Line("Unable to find new file location for " & BE.Get_Bibtex_Key(Ref));
                      end;
                   end if;
                end;
             else
-               Put_Line("No file attribute for entry " & Bib.Reference(i).Get_Bibtex_Key);
+               Put_Line("No file attribute for entry " & BE.Get_Bibtex_Key(Bibliography_Library.Reference(Bib, i)));
             end if;
          end;
       end loop;
 
-      Bib.Save_To_Bibtex_File(To_String(In_Out_Arg_Helper.arg_spec.output_Path));
+      Bibliography_Library.Save_To_Bibtex_File(Bib,
+                                               To_String(In_Out_Arg_Helper.arg_spec.output_Path));
 
    end Execute;
 

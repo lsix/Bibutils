@@ -283,7 +283,7 @@ package body Bibentry is
          Curr_Char := Get_Char(Stream);
       end loop;
 
-      Bib_Entry.Set_Bibtex_Type(To_String(Accumulator));
+      Set_Bibtex_Type(Bib_Entry, To_String(Accumulator));
       Accumulator := Null_Unbounded_String;
 
       Skip_Blank;
@@ -298,7 +298,7 @@ package body Bibentry is
          Append(Accumulator, Curr_Char);
          Curr_Char := Get_Char(Stream);
       end loop;
-      Bib_Entry.Set_Bibtex_Key(To_String(Accumulator));
+      Set_Bibtex_Key(Bib_Entry, To_String(Accumulator));
       Accumulator := Null_Unbounded_String;
       Skip_Blank;
       if not(Curr_Char = ',') then
@@ -326,12 +326,14 @@ package body Bibentry is
          Skip_Blank;
 
          if Curr_Char = '{' then
-            Bib_Entry.Set_Bibtex_Property(Prop_Name => To_String(Accumulator),
-                                          Prop_Val  => Read_Braket_Enclosed_Value);
+            Set_Bibtex_Property(Bibentry  => Bib_Entry,
+                                Prop_Name => To_String(Accumulator),
+                                Prop_Val  => Read_Braket_Enclosed_Value);
          else -- Curr_Char = '"' then
             -- TODO manage those values that can contains references to Strings
-            Bib_Entry.Set_Bibtex_Property(Prop_Name => To_String(Accumulator),
-                                          Prop_Val  => Read_Braket_Enclosed_Value);
+            Set_Bibtex_Property(Bibentry  => Bib_Entry,
+                                Prop_Name => To_String(Accumulator),
+                                Prop_Val  => Read_Braket_Enclosed_Value);
             raise Invalid_Entry;
          end if;
          Accumulator := Null_Unbounded_String;

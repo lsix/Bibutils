@@ -36,9 +36,9 @@ with Ada.Strings.Unbounded;
 with Ada.Text_IO;
 with Bibentry;
 with Bibliography_Library;
+with Command_Line_Parser;
 with Config;
 with In_Out_Arg_Helper;
-with Command_Line_Parser;
 
 package body Command.Sort is
    Cmd_Parser : Command_Line_Parser.Command_Line_Parser_Type;
@@ -70,9 +70,10 @@ package body Command.Sort is
 
       Bibfile : Bibliography_Library.Bibliography_Library_Type;
 
-      function Compare_By_Key(Left, Right : Bibentry.Bibentry_Type'Class) return Boolean is
+      function Compare_By_Key(Left, Right : Bibentry.Bibentry_Type) return Boolean is
       begin
-         return Ada.Strings.Fixed.Less_Case_Insensitive(Left.Get_Bibtex_Key, Right.Get_Bibtex_Key);
+         return Ada.Strings.Fixed.Less_Case_Insensitive(Bibentry.Get_Bibtex_Key(Left),
+                                                        Bibentry.Get_Bibtex_Key(Right));
       end Compare_By_Key;
 
       procedure Sort_By_Key is new Bibliography_Library.Sort(Compare_By_Key);
@@ -80,11 +81,13 @@ package body Command.Sort is
       Command_Line_Parser.Parse(Cmd_Parser);
 
 
-      Bibfile.Load_From_Bibtex_File(To_String(In_Out_Arg_Helper.arg_spec.input_path));
+      Bibliography_Library.Load_From_Bibtex_File(Bibfile,
+                                                 To_String(In_Out_Arg_Helper.arg_spec.input_path));
 
       Sort_By_Key(Bibfile);
 
-      Bibfile.Save_To_Bibtex_File(To_String(In_Out_Arg_Helper.arg_spec.output_path));
+      Bibliography_Library.Save_To_Bibtex_File(Bibfile,
+                                               To_String(In_Out_Arg_Helper.arg_spec.output_path));
    end Execute;
 
    procedure Init is

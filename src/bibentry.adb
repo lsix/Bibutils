@@ -271,6 +271,17 @@ package body Bibentry is
          return To_String(Acc);
       end Read_Braket_Enclosed_Value;
 
+      function Read_Raw_Value return String is
+         Acc : Unbounded_String := Null_Unbounded_String;
+      begin
+         loop
+            Curr_Char := Get_Char(Stream);
+            exit when Is_White_Space(Curr_Char);
+            Append(Acc, Curr_Char);
+         end loop;
+         return To_String(Acc);
+      end Read_Raw_Value;
+
 --      function Read_Db_Quoted_Value return String is
 --      begin
 --         return "";
@@ -341,12 +352,16 @@ package body Bibentry is
             Set_Bibtex_Property(Bibentry  => Bib_Entry,
                                 Prop_Name => To_String(Accumulator),
                                 Prop_Val  => Read_Braket_Enclosed_Value);
-         else -- Curr_Char = '"' then
+         elsif Curr_Char = '"' then
             -- TODO manage those values that can contains references to Strings
             Set_Bibtex_Property(Bibentry  => Bib_Entry,
                                 Prop_Name => To_String(Accumulator),
                                 Prop_Val  => Read_Braket_Enclosed_Value);
             raise Invalid_Entry;
+         else
+            Set_Bibtex_Property(Bibentry  => Bib_Entry,
+                                Prop_Name => To_String(Accumulator),
+                                Prop_Val  => Read_Raw_Value);
          end if;
          Accumulator := Null_Unbounded_String;
          Skip_Blank;

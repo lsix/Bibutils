@@ -32,7 +32,6 @@
 with Ada.Containers.Ordered_Maps;
 with Ada.Streams;
 with Ada.Strings.Unbounded;
-with Ada.Finalization;
 
 package Bibentry is
 
@@ -80,6 +79,10 @@ package Bibentry is
                                 Prop_Name : String)
                                 return String
      with Precondition => Has_Bibtex_Property(Bibentry, Prop_Name);
+
+   -- Equality and comparison operator are applied to the entry key
+   function "="(Left, Right : Bibentry_Type) return Boolean;
+   function "<"(Left, Right : Bibentry_Type) return Boolean;
 
    -- Retourne l'ensemble des propriétés définies pour une entrée
    -- bibliographique

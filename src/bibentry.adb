@@ -31,12 +31,14 @@
 
 with Ada.Characters.Latin_1;
 with Ada.Exceptions;
+with Ada.Strings.Equal_Case_Insensitive;
+with Ada.Strings.Less_Case_Insensitive;
 with Ada.Strings.Unbounded;                          use Ada.Strings.Unbounded;
 with Ada.Strings;
 with Character_Utils;
 
 package body Bibentry is
-
+   ----------------------------------------------------------------------------
    -- Set the type of bibentry (article, inproceeding, phdthesis,...)
    procedure Set_Bibtex_Type(Bibentry  : in out Bibentry_Type;
                              Type_Name : String) is
@@ -44,6 +46,7 @@ package body Bibentry is
       Bibentry.Entry_Type := To_Unbounded_String(Type_Name);
    end Set_Bibtex_Type;
 
+   ----------------------------------------------------------------------------
    -- Get the name of the bibentry
    function Get_Bibtex_Type(Bibentry : Bibentry_Type)
                             return String is
@@ -51,6 +54,7 @@ package body Bibentry is
       return To_String(Bibentry.Entry_Type);
    end Get_Bibtex_Type;
 
+   ----------------------------------------------------------------------------
    -- Set the bibtex key of the bibentry bibliography
    -- entry element
    procedure Set_Bibtex_Key(Bibentry : in out Bibentry_Type;
@@ -59,6 +63,7 @@ package body Bibentry is
       Bibentry.Key := To_Unbounded_String(Key);
    end Set_Bibtex_Key;
 
+   ----------------------------------------------------------------------------
    -- Get the bibtex key of the bibentry bibliography
    -- element
    function Get_Bibtex_Key(bibentry : Bibentry_Type)
@@ -67,6 +72,7 @@ package body Bibentry is
       return To_String(Bibentry.Key);
    end Get_Bibtex_Key;
 
+   ----------------------------------------------------------------------------
    -- Set the property Prop_Name for the bibentry bibliography
    -- entry.
    procedure Set_Bibtex_Property(Bibentry  : in out Bibentry_Type;
@@ -85,6 +91,7 @@ package body Bibentry is
       end if;
    end Set_Bibtex_Property;
 
+   ----------------------------------------------------------------------------
    -- Returns the value of the property designated by
    -- propname in the bibliography entry bibentry
    function Get_Bibtex_Property(Bibentry  : Bibentry_Type;
@@ -95,6 +102,7 @@ package body Bibentry is
       return To_String(Bibentry.properties.Element(us_prop_key));
    end Get_Bibtex_Property;
 
+   ----------------------------------------------------------------------------
    -- Tels wether or not the property Prop_Name is defined
    -- (has a value) in the Bibentry bibliography entry.
    function Has_Bibtex_Property(Bibentry  : Bibentry_Type;
@@ -104,6 +112,7 @@ package body Bibentry is
       return Bibentry.properties.Contains(To_Unbounded_String(Prop_Name));
    end Has_Bibtex_Property;
 
+   ----------------------------------------------------------------------------
    -- Retourne l'ensemble des propriétés définies pour une entrée
    -- bibliographique
    function Get_Bibtex_Property_Names(Bibentry : Bibentry_Type)
@@ -121,6 +130,7 @@ package body Bibentry is
       return ret;
    end Get_Bibtex_Property_Names;
 
+   ----------------------------------------------------------------------------
    function To_String(Bibentry : Bibentry_Type) return String is
       use Ada.Strings;
 
@@ -159,6 +169,7 @@ package body Bibentry is
       return To_String(String_Rep);
    end To_String;
 
+   ----------------------------------------------------------------------------
    -- I/O related operations
    procedure Print(Stream : not null access Ada.Streams.Root_Stream_Type'Class;
                    Item   : Bibentry_Type) is
@@ -174,6 +185,7 @@ package body Bibentry is
       Stream.Write(Buffer);
    end Print;
 
+   ----------------------------------------------------------------------------
    function Read(Stream : not null access Ada.Streams.Root_Stream_Type'Class;
                  curr_line_number : in out Natural;
                  curr_char_number : in out Natural) return Bibentry_Type is
@@ -352,6 +364,7 @@ package body Bibentry is
       return Bib_Entry;
    end Read;
 
+   ----------------------------------------------------------------------------
    function Read(Stream : not null access Ada.Streams.Root_Stream_Type'Class) return Bibentry_Type is
       curr_ln : Natural := 1;
       curr_char : Natural := 1;
@@ -359,5 +372,19 @@ package body Bibentry is
       return Read(Stream, curr_ln, curr_char);
    end Read;
 
+   ----------------------------------------------------------------------------
+   function "="(Left, Right : Bibentry_Type) return Boolean is
+   begin
+	return Ada.Strings.Equal_Case_Insensitive(Get_Bibtex_Key(Left),
+                                                  Get_Bibtex_Key(Right));
 
+   end "=";
+
+   ----------------------------------------------------------------------------
+   function "<"(Left, Right : Bibentry_Type) return Boolean is
+   begin
+	return Ada.Strings.Less_Case_Insensitive(Get_Bibtex_Key(Left),
+                                                 Get_Bibtex_Key(Right));
+
+   end "<";
 end Bibentry;

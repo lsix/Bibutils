@@ -33,6 +33,7 @@ with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Strings.Equal_Case_Insensitive;
 with Ada.Strings.Hash;
 with Ada.Characters.Handling;
+pragma Unreferenced(Ada.Characters.Handling);
 
 package Command is
 

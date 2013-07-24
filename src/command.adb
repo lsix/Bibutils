@@ -31,7 +31,6 @@
 
 with Ada.Characters.Latin_1;
 with Ada.Text_IO;
-with Ada.Strings.Fixed.Equal_Case_Insensitive;
 
 package body Command is
 
@@ -60,8 +59,8 @@ package body Command is
 
    function "="(Left, Right : Command_Type'Class) return Boolean is
    begin
-      return Ada.Strings.Fixed.Equal_Case_Insensitive(Get_Name(Left),
-                                                      Get_name(Right));
+      return Ada.Strings.Equal_Case_Insensitive(Get_Name(Left),
+                                                Get_name(Right));
    end "=";
    function "="(Left, Right : Command_Type_Access) return Boolean is
    begin

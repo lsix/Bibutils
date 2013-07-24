@@ -34,8 +34,9 @@ with Command_Line_Parser;
 with Ada.Command_Line;
 with Ada.Strings.Unbounded;
 with Bibentry;
-with Bibliography_Library; use Bibliography_Library;
-with Ada.Strings.Fixed.Less_Case_Insensitive;
+with Bibliography_Library;
+with Bibliography_Library_Merge;
+with Ada.Strings.Less_Case_Insensitive;
 
 package body Command.Merge is
    Cmd_Parser   : Command_Line_Parser.Command_Line_Parser_Type;
@@ -56,9 +57,76 @@ package body Command.Merge is
    ----------------------------------------------------------------------------
    -- Execute
    procedure Execute(Cmd : in out Merge_Command_Type) is
+      pragma Unreferenced(Cmd);
+
+      function Decide_between_two_entries(Left, Right : Bibentry.Bibentry_Type) return
+        Bibliography_Library_Merge.Strict_Choice_Type is
+
+         c : Character;
+      begin
+         Put_Line("There is an ambiguity between a:" &
+                    Bibentry.Get_Bibtex_Key(Left) & " and b:" &
+                    Bibentry.Get_Bibtex_Key(Right));
+         New_Line;
+         Put_Line("a:");
+         Put_Line(Bibentry.To_String(Left));
+         New_Line;
+         Put_Line("b:");
+         Put_Line(Bibentry.To_String(Right));
+         New_Line;
+         Put("Use a(a), b(b) or both(e) : ");
+         Ada.Text_IO.Get(c);
+         while c /= 'a' and c /= 'b' and c /= 'e' loop
+            Put_Line("Invalid answer. Please retry");
+            Put("Use a(a), b(b) or both(e) : ");
+            Ada.Text_IO.Get(c);
+         end loop;
+         case c is
+         when 'a' =>
+            return Bibliography_Library_Merge.Left;
+         when 'b' =>
+            return Bibliography_Library_Merge.Right;
+         when 'e' =>
+            return Bibliography_Library_Merge.Both;
+            when others =>
+               raise Program_Error with "Invalid state";
+         end case;
+      end Decide_between_two_entries;
+
+      function Comp(Left, Right : Bibentry.Bibentry_Type) return Boolean is
+      begin
+         return Ada.Strings.Less_Case_Insensitive(Bibentry.Get_Bibtex_Key(Left),
+                                                  Bibentry.Get_Bibtex_Key(Right));
+      end Comp;
+
+      procedure Merge is new Bibliography_Library_Merge.Strinct_Append(Decide_Fct => Decide_between_two_entries,
+                                                                       "<"        => Comp);
+      procedure Sort is new Bibliography_Library.Sort("<" => Comp);
+
+      Acc : Bibliography_Library.Bibliography_Library_Type;
+      Oth : Bibliography_Library.Bibliography_Library_Type;
    begin
-      -- TODO
-      null;
+      Command_Line_Parser.Parse(Cmd_Parser);
+
+      Put_Line("Merging into " & Ada.Strings.Unbounded.To_String(Out_Path));
+      Put(ASCII.HT & "Merging " & Ada.Command_Line.Argument(1));
+      Bibliography_Library.Load_From_Bibtex_File(Acc,
+                                                 Ada.Command_Line.Argument(1));
+      Put_Line(" (" & Natural'Image(Bibliography_Library.Length(Acc)) & ")");
+      Sort(Acc);
+      for i in 2..Ada.Command_Line.Argument_Count loop
+         Put(ASCII.HT & "Merging " & Ada.Command_Line.Argument(i));
+         Bibliography_Library.Load_From_Bibtex_File(Oth,
+                                                    Ada.Command_Line.Argument(i));
+         Sort(Oth);
+         Merge(Accum => Acc,
+               Other => Oth);
+         Put_Line(" (" & Natural'Image(Bibliography_Library.Length(Oth)) & " -> " & Natural'Image(Bibliography_Library.Length(Acc)) & ")");
+         Bibliography_Library.Clear(Oth);
+      end loop;
+
+      Bibliography_Library.Save_To_Bibtex_File(Acc,
+                                               Ada.Strings.Unbounded.To_String(Out_Path));
    end Execute;
 
    -- Callback used to set the out file path

@@ -24,41 +24,29 @@
 -- encouraged to load and test the software's suitability as regards their   --
 -- requirements in conditions enabling the security of their systems and/or  --
 -- data to be ensured and,  more generally, to use and operate it in the     --
--- same conditions as regards security.                                      --
+--ame conditions as regards security.                                        --
 --                                                                           --
 -- The fact that you are presently reading this means that you have had      --
 -- knowledge of the CeCILL license and that you accept its terms.            --
 
-with Ada.Command_Line;
-with Ada.Command_Line.Remove;
-with Command;
+with Ada.Characters.Handling;
 
-with Command.Help;
-with Command.Sort;
-with Command.Relocate;
-with Command.Merge;
+package body Strings_Utils is
 
+   function Is_Begining_Of_Case_Insensitive(a, b : String) return Boolean is
+   begin
+      if a = "" then
+           return true;
+      elsif b = "" then
+         return false;
+      elsif Ada.Characters.Handling.To_Lower(a(a'First)) =
+        Ada.Characters.Handling.To_Lower(b(b'First)) then
+         return Is_Begining_Of_Case_Insensitive(a((a'First+1)..a'Last),
+                                                b((b'First+1)..b'Last));
+      else
+         return false;
+      end if;
 
-procedure Bibutil is
-begin
-   -- Set up commands
-   Command.Help.Init;
-   Command.Sort.Init;
-   Command.Relocate.Init;
-   Command.Merge.Init;
+   end is_Begining_Of_Case_Insensitive;
 
-   -- At least one argument, the first one should be the command
-   if Ada.Command_Line.Argument_Count >= 1 then
-      declare
-         cmd : constant String := Ada.Command_Line.Argument(1);
-      begin
-         -- When a command is ran, it only sees its arguments not
-         -- the ones passed to the main program
-         Ada.Command_Line.Remove.Remove_Argument(1);
-         Command.Execute_Command(Cmd);
-      end;
-   else
-      Command.Print_Program_Help;
-   end if;
-
-end Bibutil;
+end Strings_Utils;

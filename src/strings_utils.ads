@@ -24,41 +24,13 @@
 -- encouraged to load and test the software's suitability as regards their   --
 -- requirements in conditions enabling the security of their systems and/or  --
 -- data to be ensured and,  more generally, to use and operate it in the     --
--- same conditions as regards security.                                      --
+--ame conditions as regards security.                                        --
 --                                                                           --
 -- The fact that you are presently reading this means that you have had      --
 -- knowledge of the CeCILL license and that you accept its terms.            --
 
-with Ada.Command_Line;
-with Ada.Command_Line.Remove;
-with Command;
+package Strings_Utils is
 
-with Command.Help;
-with Command.Sort;
-with Command.Relocate;
-with Command.Merge;
+   function Is_Begining_Of_Case_Insensitive(a, b : String) return Boolean;
 
-
-procedure Bibutil is
-begin
-   -- Set up commands
-   Command.Help.Init;
-   Command.Sort.Init;
-   Command.Relocate.Init;
-   Command.Merge.Init;
-
-   -- At least one argument, the first one should be the command
-   if Ada.Command_Line.Argument_Count >= 1 then
-      declare
-         cmd : constant String := Ada.Command_Line.Argument(1);
-      begin
-         -- When a command is ran, it only sees its arguments not
-         -- the ones passed to the main program
-         Ada.Command_Line.Remove.Remove_Argument(1);
-         Command.Execute_Command(Cmd);
-      end;
-   else
-      Command.Print_Program_Help;
-   end if;
-
-end Bibutil;
+end Strings_Utils;

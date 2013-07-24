@@ -32,7 +32,6 @@
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Streams;
 with Bibentry;                               use Bibentry;
-with Ada.Finalization;
 
 
 package Bibliography_Library is
@@ -110,6 +109,9 @@ package Bibliography_Library is
    function Contains_Key(Lib : Bibliography_Library_Type;
                          key : String)
                          return Boolean;
+
+   -- Remove all bibentries from the library
+   procedure Clear(Lib : in out Bibliography_Library_Type);
 
    -- Re-orders the library according to a "<" function
    generic

@@ -80,16 +80,15 @@ package body Bibliography_Library_Merge is
             elsif decide_res = Bibliography_Library_Merge.Right then
                Bibliography_Library.Append(Result, Right_Elt);
                Next_Right;
-            else -- use both
+            else -- use both, only put the first one, the second one will come
+               -- later
                if "<"(Left_Elt, Right_Elt) then
                   Bibliography_Library.Append(Result, Left_Elt);
-                  Bibliography_Library.Append(Result, Right_Elt);
+                  Next_Left;
                else
                   Bibliography_Library.Append(Result, Right_Elt);
-                  Bibliography_Library.Append(Result, Left_Elt);
+                  Next_Right;
                end if;
-               Next_Right;
-               Next_Left;
             end if;
          elsif Ada.Strings.Less_Case_Insensitive(Bibentry.Get_Bibtex_Key(Left_Elt),
                                                  Bibentry.Get_Bibtex_Key(Right_Elt)) then

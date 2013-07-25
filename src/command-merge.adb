@@ -36,7 +36,6 @@ with Ada.Strings.Unbounded;
 with Bibentry;
 with Bibliography_Library;
 with Bibliography_Library_Merge;
-with Ada.Strings.Less_Case_Insensitive;
 
 package body Command.Merge is
    Cmd_Parser   : Command_Line_Parser.Command_Line_Parser_Type;
@@ -93,15 +92,9 @@ package body Command.Merge is
          end case;
       end Decide_between_two_entries;
 
-      function Comp(Left, Right : Bibentry.Bibentry_Type) return Boolean is
-      begin
-         return Ada.Strings.Less_Case_Insensitive(Bibentry.Get_Bibtex_Key(Left),
-                                                  Bibentry.Get_Bibtex_Key(Right));
-      end Comp;
-
       procedure Merge is new Bibliography_Library_Merge.Strinct_Append(Decide_Fct => Decide_between_two_entries,
-                                                                       "<"        => Comp);
-      procedure Sort is new Bibliography_Library.Sort("<" => Comp);
+                                                                       "<"        => Bibentry."<");
+      procedure Sort is new Bibliography_Library.Sort("<" => Bibentry."<");
 
       Acc : Bibliography_Library.Bibliography_Library_Type;
       Oth : Bibliography_Library.Bibliography_Library_Type;

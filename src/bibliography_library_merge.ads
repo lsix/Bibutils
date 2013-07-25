@@ -45,13 +45,6 @@ package Bibliography_Library_Merge is
       with function "<"(Left, Write: Bibentry.Bibentry_Type) return Boolean;
    procedure Strict_Merge(Result      : out Bibliography_Library.Bibliography_Library_Type;
                           Left, Right : in  Bibliography_Library.Bibliography_Library_Type);
---     with
---     Precondition  =>
---       (for all i in 1..Bibliography_Library.Length(Left)  => (Bibliography_Library.Element(Left,  i-1) < Bibliography_Library.Element(Left, i))) and
---       (for all i in 1..Bibliography_Library.Length(Right) => (Bibliography_Library.Element(Right, i-1) < Bibliography_Library.Element(Right, i))) and
---       Bibliography_Library.Length(Left) > 0 and Bibliography_Library.Length(Right) > 0,
---     Postcondition =>
---       (for all i in 1..Bibliography_Library.Length(Result)  => (Bibliography_Library.Element(Result, i-1) < Bibliography_Library.Element(Result, i)));
 
 
    -- Merge two libraries into one new library
@@ -66,11 +59,5 @@ package Bibliography_Library_Merge is
       with function "<"(Left, Write: Bibentry.Bibentry_Type) return Boolean;
    procedure Strinct_Append(Accum : in out Bibliography_Library.Bibliography_Library_Type;
                             other : in Bibliography_Library.Bibliography_Library_Type);
-     -- Accum must be sorted according to Compare before and after the fct
-     -- call
---   with
---     Precondition  => (for all i in 1..Bibliography_Library.Length(Accum) => (Bibliography_Library.Element(Accum, i-1) < Bibliography_Library.Element(Accum, i))),
---     Postcondition => (for all i in 1..Bibliography_Library.Length(Accum) => (Bibliography_Library.Element(Accum, i-1) < Bibliography_Library.Element(Accum, i)));
-   -- Similar to Strict_Merge but add all the entries of other into Accum.
 
 end Bibliography_Library_Merge;
